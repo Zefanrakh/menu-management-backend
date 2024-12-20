@@ -39,11 +39,19 @@ let menuService = class menuService {
         return this.findMenuByIdUseCase.execute(id);
     }
     async deleteMenu(id) {
-        const menu = await this.menuRepository.findById(id);
-        if (!menu) {
-            throw new Error('Menu not found');
+        try {
+            const menu = await this.menuRepository.findById(id);
+            if (!menu) {
+                throw new common_1.HttpException('Menu not found', common_1.HttpStatus.NOT_FOUND);
+            }
+            if (!menu.parent) {
+                throw new common_1.HttpException('Cannot delete root menu', common_1.HttpStatus.BAD_REQUEST);
+            }
+            await this.deleteMenuUseCase.execute(id);
         }
-        await this.deleteMenuUseCase.execute(id);
+        catch (e) {
+            throw e;
+        }
     }
 };
 exports.menuService = menuService;

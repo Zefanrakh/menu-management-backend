@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Menu } from 'src/domain/entities/menu.entity';
 import { MenuRepository } from 'src/domain/repositories/menu.repository';
 import { UpdateMenuDto } from 'src/infrastructure/modules/menu/dtos/update-menu.dto';
@@ -41,10 +41,20 @@ export class menuService {
   }
 
   async deleteMenu(id: number): Promise<void> {
-    const menu = await this.menuRepository.findById(id);
-    if (!menu) {
-      throw new Error('Menu not found');
+    try {
+      const menu = await this.menuRepository.findById(id);
+      if (!menu) {
+        throw new HttpException('Menu not found', HttpStatus.NOT_FOUND);
+      }
+      if (!menu.parent) {
+        throw new HttpException(
+          'Cannot delete root menu',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      await this.deleteMenuUseCase.execute(id);
+    } catch (e) {
+      throw e;
     }
-    await this.deleteMenuUseCase.execute(id);
   }
 }

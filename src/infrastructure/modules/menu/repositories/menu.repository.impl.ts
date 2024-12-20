@@ -15,7 +15,11 @@ export class MenuRepositoryImpl implements MenuRepository {
   }
 
   async findById(id: number): Promise<Menu | null> {
-    return await this.repo.findOne({ where: { id } });
+    return await this.repo
+      .createQueryBuilder('menu')
+      .loadRelationIdAndMap('menu.parent', 'menu.parent')
+      .where('menu.id = :id', { id })
+      .getOne();
   }
 
   async findAll(params: FindManyOptions<Menu>['where'] = {}): Promise<Menu[]> {

@@ -25,7 +25,11 @@ let MenuRepositoryImpl = class MenuRepositoryImpl {
         return await this.repo.save(menu);
     }
     async findById(id) {
-        return await this.repo.findOne({ where: { id } });
+        return await this.repo
+            .createQueryBuilder('menu')
+            .loadRelationIdAndMap('menu.parent', 'menu.parent')
+            .where('menu.id = :id', { id })
+            .getOne();
     }
     async findAll(params = {}) {
         return await this.repo

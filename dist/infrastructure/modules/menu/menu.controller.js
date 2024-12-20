@@ -17,12 +17,18 @@ const common_1 = require("@nestjs/common");
 const create_menu_dto_1 = require("./dtos/create-menu.dto");
 const update_menu_dto_1 = require("./dtos/update-menu.dto");
 const menu_service_1 = require("../../../application/services/menu.service");
+const errorHandling_1 = require("../../../application/errorHandling/errorHandling");
 let MenuController = class MenuController {
     constructor(menuService) {
         this.menuService = menuService;
     }
     async create(createMenuDto) {
-        return this.menuService.createMenu(createMenuDto);
+        try {
+            return this.menuService.createMenu(createMenuDto);
+        }
+        catch (e) {
+            (0, errorHandling_1.handleError)(e);
+        }
     }
     async findAll() {
         return this.menuService.listMenus();
@@ -31,10 +37,20 @@ let MenuController = class MenuController {
         return this.menuService.findMenuById(id);
     }
     async update(id, updateMenuDto) {
-        return this.menuService.updateMenu(id, updateMenuDto);
+        try {
+            return this.menuService.updateMenu(id, updateMenuDto);
+        }
+        catch (e) {
+            (0, errorHandling_1.handleError)(e);
+        }
     }
     async remove(id) {
-        return this.menuService.deleteMenu(id);
+        try {
+            return this.menuService.deleteMenu(id);
+        }
+        catch (e) {
+            (0, errorHandling_1.handleError)(e);
+        }
     }
 };
 exports.MenuController = MenuController;
